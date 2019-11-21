@@ -9,7 +9,7 @@ require "logstash/outputs/base"
 # You can connect to it with ws://<host\>:<port\>/
 #
 # If no clients are connected, any messages received are ignored.
-class LogStash::Outputs::WebSocket < LogStash::Outputs::Base
+class WebSocket < LogStash::Outputs::Base
   config_name "websocket"
 
   # The address to serve websocket data from
@@ -17,6 +17,9 @@ class LogStash::Outputs::WebSocket < LogStash::Outputs::Base
 
   # The port to serve websocket data from
   config :port, :validate => :number, :default => 3232
+
+  # The default filter to filter output messages
+  config :web_filter, :validate => :string, :default => "{}"
 
   public
   def register
@@ -27,7 +30,7 @@ class LogStash::Outputs::WebSocket < LogStash::Outputs::Base
     @pubsub.logger = @logger
     @server = Thread.new(@pubsub) do |pubsub|
       begin
-        Rack::Handler::FTW.run(LogStash::Outputs::WebSocket::App.new(pubsub, @logger),
+        Rack::Handler::FTW.run(LogStash::Outputs::WebSocket::App.new(pubsub, @web_filter, @logger),
                                :Host => @host, :Port => @port)
       rescue => e
         @logger.error("websocket server failed", :exception => e)

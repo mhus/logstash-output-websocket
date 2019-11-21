@@ -2,7 +2,7 @@
 require "logstash/namespace"
 require "logstash/outputs/websocket"
 
-class LogStash::Outputs::WebSocket::Pubsub
+class Pubsub
   attr_accessor :logger
 
   def initialize
